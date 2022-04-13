@@ -12,7 +12,7 @@
     <title>Title</title>
 </head>
 <body>
-<form action="" method="post">
+<form method="post">
 <table>
     <tr>
         <th>Enter Name</th>
@@ -32,7 +32,7 @@
     </tr>
     <tr>
         <th>Enter Description</th>
-        <td><input type="text" name="description" placeholder="enter description"></td>
+        <td><textarea name="description"  cols="45" rows="10"></textarea></td>
     </tr>
 
     <tr>
@@ -40,14 +40,15 @@
         <td>
             <select name="category" id="category">
                 <c:forEach items="${categories}" var="cat">
-                    <option value="${cat.id}">${cat.getName()}</option>
+                    <option value="${cat.id}">${cat.name}</option>
                 </c:forEach>
             </select>
         </td>
     </tr>
     <tr>
-        <td><button type="button" onclick="location.href='/ProductServlet?action=cat'">Back list product</button></td>
-        <td><button type="submit" onclick="location.href='/ProductServlet?action='">Add</button></td>
+        <td><button type="submit">Create</button></td>
+        <td><button type="button" onclick="location.href='/ProductServlet?action=product'">Back </button></td>
+
     </tr>
 </table>
 </form>

@@ -15,6 +15,9 @@ public class ProductDAO implements IProductDAO {
     public static final String SQL_SELECT_FROM_PRODUCT = "select product.id as id, product.name as name, price, quantity, color, description, c.id as Cat_id, c.name as CategoryName  from product join Category C on C.id = product.cat_id;";
     public static final String SQL_INSERT_INTO_PRODUCT = "insert into product (name, price, quantity, color, description, cat_id)\n" +
             "values (?,?,?,?,?,?);";
+    public static final String SQL_UPDATE_PRODUCT = "update product p join category c on c.id = p.cat_id set p.name = ?, price =?, quantity = ?, color = ?, description =?, cat_id = ? where p.id = ?;";
+    public static final String SQL_FIND_PRODUCT_BY_ID = "select product.id as id, product.name as name, price, quantity, color, description, c.id as Cat_id, c.name as CategoryName  from product join Category C on C.id = product.cat_id where product.id =?;";
+    public static final String SQL_DELETE_PRODUCT_BY_ID = "delete from product where id =?";
     Connection connection = SingletonConnection.getConnection();
     @Override
     public List<Product> findAll() {
@@ -43,14 +46,54 @@ public class ProductDAO implements IProductDAO {
         return products;
     }
 
+//    public static void main(String[] args) {
+//        IProductDAO productDAO = new ProductDAO();
+//        System.out.println(productDAO.findById(1));
+//    }
+
     @Override
     public Product findById(int id) {
-        return IProductDAO.super.findById(id);
+        Product product = null;
+        try(
+                PreparedStatement pstm = connection.prepareStatement(SQL_FIND_PRODUCT_BY_ID
+                ))
+                 {
+                     pstm.setInt(1,id);
+                     ResultSet rs = pstm.executeQuery();
+                     while (rs.next()){
+                         String name = rs.getString("name");
+                         int price = rs.getInt("price");
+                         int quantity = rs.getInt("quantity");
+                         String color = rs.getString("color");
+                         String description = rs.getString("description");
+                         int cat_id = rs.getInt("Cat_id");
+                         String categoryName = rs.getString("CategoryName");
+                         Category category = new Category(cat_id, categoryName);
+                         product = new Product(id, name, price, quantity, color, description, category);
+                     }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return product;
     }
 
     @Override
     public boolean update(Product product) {
-        return IProductDAO.super.update(product);
+        try ( PreparedStatement pstm = connection.prepareStatement(SQL_UPDATE_PRODUCT)) {
+        pstm.setString(1, product.getName());
+        pstm.setInt(2, product.getPrice());
+        pstm.setInt(3, product.getQuantity());
+        pstm.setString(4, product.getColor());
+        pstm.setString(5, product.getDescription());
+        pstm.setInt(6, product.getCategory().getId());
+        pstm.setInt(7, product.getId());
+         return pstm.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -71,4 +114,19 @@ public class ProductDAO implements IProductDAO {
         }
         return false;
     }
+
+
+    @Override
+    public boolean delete(int id) throws SQLException {
+        boolean rowDeleted;
+        try(
+                PreparedStatement pstm = connection.prepareStatement(SQL_DELETE_PRODUCT_BY_ID)
+                ){
+            pstm.setInt(1, id);
+            rowDeleted = pstm.executeUpdate() > 0;
+        }
+        return rowDeleted;
+    }
+
+
 }

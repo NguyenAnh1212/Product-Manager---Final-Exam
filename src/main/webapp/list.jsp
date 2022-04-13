@@ -14,6 +14,7 @@
 </head>
 <body>
 <h1>Product List</h1>
+<a href="/ProductServlet?action=create">Add New Product</a>
 <table border="1px solid">
     <tr>
         <th>#</th>
@@ -35,13 +36,11 @@
             <td>${p.getDescription()}</td>
             <td>${p.getCategory().getName()}</td>
             <td>
-                <a href="/ProductServlet?action=edit&id=${d.id}">Edit </a>
-                <a href="/ProductServlet?action=delete&id=${d.id}">Delete</a>
+                <a href="/ProductServlet?action=edit&id=${p.id}">Edit </a>
+                <a href="/ProductServlet?action=delete&id=${p.id}">Delete</a>
             </td>
-
         </tr>
     </c:forEach>
-
 </table>
 
 </body>

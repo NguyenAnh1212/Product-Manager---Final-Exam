@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static config.SingletonConnection.getConnection;
+
 
 public class CategoryDAO implements ICategoryDAO {
     Connection connection = SingletonConnection.getConnection();
@@ -18,7 +18,6 @@ public class CategoryDAO implements ICategoryDAO {
     @Override
     public List<Category> findAll() {
         List<Category> categories = new ArrayList<>();
-        connection = SingletonConnection.getConnection();
         try (
                 PreparedStatement preparedStatement = connection.prepareStatement("select * from category;");
         )
@@ -29,7 +28,6 @@ public class CategoryDAO implements ICategoryDAO {
                 String name= resultSet.getString("name");
                 Category category = new Category(id, name);
                 categories.add(category);
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -37,18 +35,44 @@ public class CategoryDAO implements ICategoryDAO {
         return categories;
     }
 
+    public static void main(String[] args) {
+        ICategoryDAO categoryDAO = new CategoryDAO();
+        System.out.println(categoryDAO.findAll());
+    }
+
+
     @Override
     public Category findById(int id) {
-        return ICategoryDAO.super.findById(id);
+        Category category = null;
+        connection = SingletonConnection.getConnection();
+        try(
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT  * FROM  category where  id =?")
+        ){
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                String name = resultSet.getString("name");
+                category = new Category(id, name);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return category;
     }
 
     @Override
     public boolean update(Category category) {
-        return ICategoryDAO.super.update(category);
+        return false;
     }
 
     @Override
     public boolean save(Category category) {
-        return ICategoryDAO.super.save(category);
+        return false;
+    }
+
+    @Override
+    public boolean delete(int id) {
+        return false;
     }
 }
